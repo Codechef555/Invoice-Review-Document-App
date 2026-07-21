@@ -537,7 +537,7 @@ wheels = [
 [[package]]
 name = "invoice-review-backend"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "azure-ai-documentintelligence" },
     { name = "azure-identity" },

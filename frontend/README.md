@@ -1,11 +1,7 @@
-# Invoice Review frontend
+# Invoice Review frontend starter
 
-The single-screen React client for the Invoice Review teaching project. It uses Vite, TypeScript, native fetch, and Tailwind CSS.
+The frontend dependencies and configuration are prepared, but application code is intentionally absent on `main`.
 
 ```bash
 pnpm install --frozen-lockfile
-cp .env.example .env
-pnpm dev
 ```
-
-The backend must be available at the URL configured by `VITE_API_BASE_URL`.

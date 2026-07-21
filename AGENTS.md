@@ -20,7 +20,7 @@ Read `docs/client-brief.md`, `docs/architecture.md`, and `docs/build-along.md` b
 - The GL catalog and selection validation live in `backend/app/accounting/`; model output never becomes business policy.
 - Business rules live in `backend/app/invoices/validation.py` and must be pure.
 - HTTP concerns live in `routes.py`; orchestration lives in `service.py`; SQLite access lives in `repository.py`.
-- Settings are read only through `backend/app/config.py` and `frontend/src/lib/env.ts`.
+- Once those modules are introduced, settings are read only through `backend/app/config.py` and `frontend/src/lib/env.ts`.
 - Do not add auth, queues, workers, deployment, batch processing, email ingestion/sending, or accounting integrations.
 - Receipt processing uses the same normalized financial-document data and a separate deterministic policy. Live VIES registration lookup remains outside the build.
 
@@ -44,7 +44,7 @@ Update `docs/build-along.md` in the same commit as every working slice. Include 
 ## Verification policy
 
 - Do not add automated test suites, `tests/` directories, or `*.test.*` files to this end-to-end teaching project.
-- Keep verification proportional and demo-oriented: lint the backend, type-check/lint/build the frontend, run `./scripts/dev.sh --check`, exercise the fictional corpus evaluators when cloud usage is intended, and manually walk through the user story in the browser.
+- Keep verification proportional and demo-oriented: verify locked installs on the starter; as code is added, lint the backend, type-check/lint/build the frontend, exercise the fictional corpus evaluators when cloud usage is intended, and manually walk through the user story in the browser.
 - Keep deterministic business rules and provider boundaries explicit and easy to inspect even though they are not backed by a committed unit-test suite.
 
 ## Secrets and data
