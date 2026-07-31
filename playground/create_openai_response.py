@@ -17,8 +17,8 @@ def main() -> None:
     prompt = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PROMPT
     service = AzureOpenAIService()
     response = service.create.response(prompt)
-    print(json.dumps(response.model_dump(), index=2, default=str))
-
+    #print(json.dumps(response.model_dump(), index=2, default=str))
+    print(response.output[0].content[0].text)
 
 if __name__ == "__main__":
     main()
