@@ -10,7 +10,7 @@ BACKEND_PATH = PROJECT_ROOT / "backend"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))
 
-from app.services.azure_openai_service import AzureOpenAIService  # noqa: E402
+from backend.app.services.azure_openai_service import AzureOpenAIService  # noqa: E402
 
 DEFAULT_PROMPT = "What is the capital of Spain?"
 

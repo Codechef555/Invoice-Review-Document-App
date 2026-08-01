@@ -17,13 +17,13 @@ BACKEND_PATH = PROJECT_ROOT / "backend"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))
 
-from app.pipeline.chain import Pipeline, PipelineContext  # noqa: E402
-from app.pipeline.classification import DocumentClassification  # noqa: E402
-from app.pipeline.steps import (  # noqa: E402
+from backend.app.pipeline.chain import Pipeline, PipelineContext  # noqa: E402
+from backend.app.pipeline.classification import DocumentClassification  # noqa: E402
+from backend.app.pipeline.steps import (  # noqa: E402
     MappingStep,
     ValidationStep,
 )
-from app.schemas.invoice.model import InvoiceExtraction  # noqa: E402
+from backend.app.schemas.invoice.model import InvoiceExtraction  # noqa: E402
 
 DEFAULT_SAMPLE = PROJECT_ROOT / "samples" / "generated" / "01-en-happy-classic.pdf"
 
