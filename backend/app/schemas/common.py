@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ExtractedValue(BaseModel):
@@ -11,7 +11,7 @@ class ExtractedValue(BaseModel):
     confidence: float | None = None
 
     @classmethod
-    def from_di_field(cls, field: Any) -> "ExtractedValue":
+    def from_di_field(cls, field: Any) -> ExtractedValue:
         if field is None:
             return cls()
 
@@ -27,3 +27,23 @@ class ExtractedValue(BaseModel):
             content=getattr(field, "content", None),
             confidence=getattr(field, "confidence", None),
         )
+
+
+class LineItem(BaseModel):
+    description: ExtractedValue | None = None
+    amount: ExtractedValue | None = None
+    quantity: ExtractedValue | None = None
+    unit_price: ExtractedValue | None = None
+    product_code: ExtractedValue | None = None
+
+
+class ValidationIssue(BaseModel):
+    code: str
+    severity: Literal["error", "warning", "info"] = "error"
+    message: str
+    field: str | None = None
+
+
+class ValidationResult(BaseModel):
+    is_valid: bool = True
+    issues: list[ValidationIssue] = Field(default_factory=list)

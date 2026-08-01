@@ -20,7 +20,12 @@ def get_azure_openai_client(endpoint: str | None = None, api_key: str | None = N
 
 
 class AzureOpenAIService:
-    def __init__(self, endpoint: str | None = None, api_key: str | None = None, deployment: str | None = None):
+    def __init__(
+        self,
+        endpoint: str | None = None,
+        api_key: str | None = None,
+        deployment: str | None = None,
+    ):
         self.client = get_azure_openai_client(endpoint, api_key)
         self.deployment = deployment or os.getenv("AZURE_OPENAI_DEPLOYMENT") or "gpt-5.6-terra"
 

@@ -32,6 +32,8 @@ cp frontend/.env.example frontend/.env
 - `docs/architecture.md`: the intended boundaries and data flow
 - `samples/`: the fictional evaluation corpus and manifest
 - `playground/agent.md`: standard path setup guide for playground script experiments
+- `backend/app/pipeline/chain.py`: pipeline chaining core (`PipelineContext`, `PipelineStep`, `Pipeline`)
+- `backend/app/pipeline/steps.py`: pipeline steps for classification, extraction model routing, schema mapping, and offline EU VAT validation
 - `backend/app/main.py`: the initial API boundary
 - `frontend/src/App.tsx`: the initial interface boundary
 
@@ -39,12 +41,13 @@ cp frontend/.env.example frontend/.env
 
 - `GET http://localhost:8000/health` returns `{"status":"ok"}`.
 - `http://localhost:5173` shows the Invoice Review starter screen.
-- No Azure request occurs at this checkpoint.
+- Running `uv run --project backend --locked --no-sync python playground/test_pipeline_chain.py` successfully executes the document pipeline chain.
 
 ## Checkpoint
 
-- [ ] Locked backend and frontend installs succeed.
-- [ ] Backend lint passes.
+- [x] Locked backend and frontend installs succeed.
+- [x] Backend lint passes (`ruff check backend playground`).
+- [x] Document processing pipeline chain verified.
 - [ ] Frontend type-check, lint, and production build pass.
 - [ ] `./scripts/dev.sh --check` reports that Invoice Review is ready to start.
 - [ ] The health endpoint and starter screen load locally.
