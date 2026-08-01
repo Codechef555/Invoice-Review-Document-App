@@ -18,7 +18,7 @@ BACKEND_PATH = PROJECT_ROOT / "backend"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))
 
-from backend.app.pipeline.classifier import classify_document_text  # noqa: E402
+from backend.app.pipeline.classification import classify_document_text  # noqa: E402
 from backend.app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
 
 DEFAULT_SAMPLE = PROJECT_ROOT / "samples" / "generated" / "01-en-happy-classic.pdf"
