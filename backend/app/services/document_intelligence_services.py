@@ -4,23 +4,30 @@ import os
 from pathlib import Path
 from typing import Any
 
-from azure.ai.documentintelligence import DocumentAnalysisClient
+from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.core.credentials import AzureKeyCredential
 
 
-def get_document_intelligence_client(endpoint: str | None = None, api_key: str | None = None) -> DocumentAnalysisClient:
+def get_document_intelligence_client(
+    endpoint: str | None = None, api_key: str | None = None
+) -> DocumentIntelligenceClient:
     endpoint = endpoint or os.getenv("AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT")
     api_key = api_key or os.getenv("AZURE_DOCUMENT_INTELLIGENCE_API_KEY")
     if not endpoint or not api_key:
         raise ValueError(
-            "Azure Document Intelligence endpoint and API key must be set as environment variables: "
+            "Azure Document Intelligence endpoint and API key must be set: "
             "AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT and AZURE_DOCUMENT_INTELLIGENCE_API_KEY"
         )
-    return DocumentAnalysisClient(endpoint, AzureKeyCredential(api_key))
+    return DocumentIntelligenceClient(endpoint=endpoint, credential=AzureKeyCredential(api_key))
 
 
 class DocumentIntelligenceService:
-    def __init__(self, endpoint: str | None = None, api_key: str | None = None, model_id: str = "prebuilt-invoice"):
+    def __init__(
+        self,
+        endpoint: str | None = None,
+        api_key: str | None = None,
+        model_id: str = "prebuilt-invoice",
+    ):
         self.client = get_document_intelligence_client(endpoint, api_key)
         self.model_id = model_id
 
@@ -30,7 +37,11 @@ class DocumentIntelligenceService:
             raise FileNotFoundError(f"Invoice file not found: {invoice_path}")
 
         with invoice_path.open("rb") as stream:
-            poller = self.client.begin_analyze_document(self.model_id, stream)
+            poller = self.client.begin_analyze_document(
+                model_id=self.model_id,
+                body=stream,
+                content_type="application/octet-stream",
+            )
             return poller.result()
 
     @staticmethod
