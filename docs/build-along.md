@@ -33,7 +33,8 @@ cp frontend/.env.example frontend/.env
 - `samples/`: the fictional evaluation corpus and manifest
 - `playground/agent.md`: standard path setup guide for playground script experiments
 - `backend/app/pipeline/chain.py`: pipeline chaining core (`PipelineContext`, `PipelineStep`, `Pipeline`)
-- `backend/app/pipeline/steps.py`: pipeline steps for classification, extraction model routing, schema mapping, and offline EU VAT validation
+- `backend/app/pipeline/gl_categorization.py`: General Ledger (GL) account catalog (10 accounts) & Azure OpenAI structured categorization
+- `backend/app/pipeline/steps.py`: pipeline steps for classification, extraction model routing, schema mapping, offline EU VAT validation, and GL categorization
 - `backend/app/main.py`: the initial API boundary
 - `frontend/src/App.tsx`: the initial interface boundary
 

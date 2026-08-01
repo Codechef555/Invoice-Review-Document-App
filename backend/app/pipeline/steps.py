@@ -8,6 +8,7 @@ from stdnum.eu import vat
 
 from app.pipeline.chain import PipelineContext, PipelineStep
 from app.pipeline.classification import classify_document_text
+from app.pipeline.gl_categorization import suggest_gl_account
 from app.schemas.common import ValidationIssue, ValidationResult
 from app.schemas.invoice.mapping import map_invoice_fields
 from app.schemas.receipt.mapping import map_receipt_fields
@@ -225,5 +226,37 @@ class ValidationStep(PipelineStep):
             context.validation_results.is_valid,
             len(issues),
         )
+
+        return context
+
+
+class GLCategorizationStep(PipelineStep):
+    """Step 5: Suggest General Ledger (GL) account code based on extracted document details."""
+
+    def __init__(self, deployment: str | None = None) -> None:
+        self.deployment = deployment
+
+    def process(self, context: PipelineContext) -> PipelineContext:
+        if not context.extracted_data:
+            logger.error("[GLCategorizationStep] extracted_data is empty.")
+            context.errors.append("GLCategorizationStep failed: extracted_data is empty.")
+            return context
+
+        logger.info("[GLCategorizationStep] Requesting GL account suggestion...")
+        try:
+            gl_result = suggest_gl_account(
+                extracted_data=context.extracted_data,
+                deployment=self.deployment,
+            )
+            context.gl_categorization = gl_result
+            logger.info(
+                "[GLCategorizationStep] Suggested GL Account: [%s] %s (confidence: %.2f)",
+                gl_result.account_code,
+                gl_result.account_name,
+                gl_result.confidence,
+            )
+        except Exception as err:
+            logger.error("[GLCategorizationStep] Error: %s", err)
+            context.errors.append(f"GLCategorizationStep failed: {err}")
 
         return context

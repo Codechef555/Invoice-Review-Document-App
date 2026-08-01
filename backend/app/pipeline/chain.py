@@ -8,6 +8,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from app.pipeline.classification import DocumentClassification
+from app.pipeline.gl_categorization import GLCategorization
 from app.schemas.common import ValidationResult
 from app.schemas.invoice.model import InvoiceExtraction
 from app.schemas.receipt.model import ReceiptExtraction
@@ -22,6 +23,7 @@ class PipelineContext(BaseModel):
     raw_analysis: dict[str, Any] | None = None
     extracted_data: InvoiceExtraction | ReceiptExtraction | None = None
     validation_results: ValidationResult | None = None
+    gl_categorization: GLCategorization | None = None
     errors: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 

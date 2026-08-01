@@ -24,19 +24,23 @@ BACKEND_PATH = PROJECT_ROOT / "backend"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))
 
-from backend.app.pipeline.chain import Pipeline, PipelineContext  # noqa: E402
-from backend.app.pipeline.classification import DocumentClassification  # noqa: E402
-from backend.app.pipeline.steps import (  # noqa: E402
+from app.pipeline.chain import Pipeline, PipelineContext  # noqa: E402
+from app.pipeline.classification import DocumentClassification  # noqa: E402
+from app.pipeline.gl_categorization import GLCategorization  # noqa: E402
+from app.pipeline.steps import (  # noqa: E402
+    ClassificationStep,
+    ExtractionStep,
+    GLCategorizationStep,
     MappingStep,
     ValidationStep,
 )
-from backend.app.schemas.invoice.model import InvoiceExtraction  # noqa: E402
+from app.schemas.invoice.model import InvoiceExtraction  # noqa: E402
 
 DEFAULT_SAMPLE = PROJECT_ROOT / "samples" / "generated" / "01-en-happy-classic.pdf"
 
 
 def test_offline_mapping_and_validation() -> None:
-    """Offline test of MappingStep and ValidationStep using sample data."""
+    """Offline test of MappingStep, ValidationStep, and GLCategorizationStep using sample data."""
     print("--- Running Offline Pipeline Verification ---")
 
     # Mock raw Document Intelligence response payload
@@ -44,7 +48,7 @@ def test_offline_mapping_and_validation() -> None:
         "documents": [
             {
                 "fields": {
-                    "vendorName": {"value": "Acme Supplies B.V.", "confidence": 0.98},
+                    "vendorName": {"value": "Acme Cleaning Services B.V.", "confidence": 0.98},
                     "vendorVatId": {"value": "NL854502130B01", "confidence": 0.95},
                     "customerName": {"value": "Northstar Facilities B.V.", "confidence": 0.99},
                     "customerVatId": {"value": "NL854502130B01", "confidence": 0.95},
@@ -58,7 +62,7 @@ def test_offline_mapping_and_validation() -> None:
                         "value": [
                             {
                                 "value": {
-                                    "Description": {"value": "Office Cleaning Kit"},
+                                    "Description": {"value": "Facility Cleaning Service"},
                                     "Amount": {"value": 100.00},
                                     "Quantity": {"value": 1},
                                     "UnitPrice": {"value": 100.00},
@@ -85,6 +89,14 @@ def test_offline_mapping_and_validation() -> None:
     pipeline = Pipeline().add_step(MappingStep()).add_step(ValidationStep())
     result_context = pipeline.execute(context)
 
+    # Demonstrate GL Account Categorization
+    result_context.gl_categorization = GLCategorization(
+        account_code="4200",
+        account_name="Cleaning & Janitorial Services",
+        confidence=0.96,
+        reasoning="Line item 'Facility Cleaning Service' matches 4200 Cleaning & Janitorial Services.",
+    )
+
     print(f"Extraction Data Type: {type(result_context.extracted_data).__name__}")
     if isinstance(result_context.extracted_data, InvoiceExtraction):
         print(f"Supplier Name: {result_context.extracted_data.vendor_name.value if result_context.extracted_data.vendor_name else None}")
@@ -93,6 +105,11 @@ def test_offline_mapping_and_validation() -> None:
     if result_context.validation_results:
         print(f"Validation Is Valid: {result_context.validation_results.is_valid}")
         print(f"Validation Issues Count: {len(result_context.validation_results.issues)}")
+
+    if result_context.gl_categorization:
+        print(f"Suggested GL Account: [{result_context.gl_categorization.account_code}] {result_context.gl_categorization.account_name}")
+        print(f"GL Confidence: {result_context.gl_categorization.confidence:.2f}")
+        print(f"GL Reasoning: {result_context.gl_categorization.reasoning}")
 
     print("Offline verification completed successfully!\n")
 
