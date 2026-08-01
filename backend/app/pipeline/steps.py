@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any
 
@@ -12,6 +13,8 @@ from app.schemas.invoice.mapping import map_invoice_fields
 from app.schemas.receipt.mapping import map_receipt_fields
 from app.services.document_intelligence_services import DocumentIntelligenceService
 
+logger = logging.getLogger(__name__)
+
 
 class ClassificationStep(PipelineStep):
     """Step 1: Classify document as invoice, receipt, or unsupported using Azure OpenAI."""
@@ -23,13 +26,24 @@ class ClassificationStep(PipelineStep):
         if not context.document_text:
             context.document_text = f"Sample document from path: {context.file_path.name}"
 
+        logger.info(
+            "[ClassificationStep] Classifying text (length: %d chars)...",
+            len(context.document_text),
+        )
         try:
             classification = classify_document_text(
                 document_text=context.document_text,
                 deployment=self.deployment,
             )
             context.classification = classification
+            logger.info(
+                "[ClassificationStep] Result: type='%s', confidence=%.2f, keywords=%s",
+                classification.document_type,
+                classification.confidence,
+                classification.detected_keywords,
+            )
         except Exception as err:
+            logger.error("[ClassificationStep] Error: %s", err)
             context.errors.append(f"ClassificationStep failed: {err}")
 
         return context
@@ -54,15 +68,21 @@ class ExtractionStep(PipelineStep):
             if context.classification
             else "invoice"
         )
+        logger.info(
+            "[ExtractionStep] Selecting model for doc_type='%s' (file: '%s')...",
+            doc_type,
+            context.file_path.name,
+        )
 
         if doc_type == "unsupported":
-            context.errors.append(
-                "Document type 'unsupported' cannot be analyzed by Document Intelligence."
-            )
+            msg = "Document type 'unsupported' cannot be analyzed by Document Intelligence."
+            logger.warning("[ExtractionStep] %s", msg)
+            context.errors.append(msg)
             return context
 
         model_id = "prebuilt-receipt" if doc_type == "receipt" else "prebuilt-invoice"
         context.metadata["selected_model_id"] = model_id
+        logger.info("[ExtractionStep] Analyzing document with model_id='%s'...", model_id)
 
         try:
             raw_result = self.doc_service.analyze_document(
@@ -70,7 +90,9 @@ class ExtractionStep(PipelineStep):
                 model_id=model_id,
             )
             context.raw_analysis = self.doc_service.to_dict(raw_result)
+            logger.info("[ExtractionStep] Document Intelligence extraction completed.")
         except Exception as err:
+            logger.error("[ExtractionStep] Failed for model '%s': %s", model_id, err)
             context.errors.append(f"ExtractionStep failed for model '{model_id}': {err}")
 
         return context
@@ -81,6 +103,7 @@ class MappingStep(PipelineStep):
 
     def process(self, context: PipelineContext) -> PipelineContext:
         if not context.raw_analysis:
+            logger.error("[MappingStep] raw_analysis is empty.")
             context.errors.append("MappingStep failed: raw_analysis is empty.")
             return context
 
@@ -90,10 +113,21 @@ class MappingStep(PipelineStep):
             else "invoice"
         )
 
+        logger.info(
+            "[MappingStep] Mapping raw analysis into Pydantic model for doc_type='%s'...",
+            doc_type,
+        )
         if doc_type == "receipt":
             context.extracted_data = map_receipt_fields(context.raw_analysis)
         else:
             context.extracted_data = map_invoice_fields(context.raw_analysis)
+
+        line_count = len(context.extracted_data.line_items) if context.extracted_data else 0
+        logger.info(
+            "[MappingStep] Successfully mapped fields into %s (%d line items).",
+            type(context.extracted_data).__name__,
+            line_count,
+        )
 
         return context
 
@@ -118,9 +152,13 @@ class ValidationStep(PipelineStep):
     def process(self, context: PipelineContext) -> PipelineContext:
         data = context.extracted_data
         if not data:
+            logger.error("[ValidationStep] extracted_data is empty.")
             context.errors.append("ValidationStep failed: extracted_data is empty.")
             return context
 
+        logger.info(
+            "[ValidationStep] Validating extracted data (EU VAT IDs & financial reconciliation)..."
+        )
         issues: list[ValidationIssue] = []
 
         # 1. EU VAT Number Validation via python-stdnum (offline structure & checksum check)
@@ -135,6 +173,9 @@ class ValidationStep(PipelineStep):
                 if raw_vat:
                     is_valid_vat = vat.is_valid(raw_vat)
                     if not is_valid_vat:
+                        logger.warning(
+                            "[ValidationStep] %s '%s' failed EU VAT validation.", label, raw_vat
+                        )
                         issues.append(
                             ValidationIssue(
                                 code="INVALID_EU_VAT_FORMAT",
@@ -155,6 +196,12 @@ class ValidationStep(PipelineStep):
             expected = subtotal + total_tax
             diff = abs(expected - total)
             if diff > 0.01:
+                logger.warning(
+                    "[ValidationStep] Total mismatch: subtotal(%.2f) + tax(%.2f) != total(%.2f)",
+                    subtotal,
+                    total_tax,
+                    total,
+                )
                 issues.append(
                     ValidationIssue(
                         code="MATHEMATICAL_RECONCILIATION_MISMATCH",
@@ -172,6 +219,11 @@ class ValidationStep(PipelineStep):
         context.validation_results = ValidationResult(
             is_valid=not has_errors,
             issues=issues,
+        )
+        logger.info(
+            "[ValidationStep] Validation completed: is_valid=%s, issues_count=%d",
+            context.validation_results.is_valid,
+            len(issues),
         )
 
         return context
