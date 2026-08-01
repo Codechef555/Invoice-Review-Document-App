@@ -31,6 +31,7 @@ cp frontend/.env.example frontend/.env
 - `docs/client-brief.md`: the recurring finance problem and definition of done
 - `docs/architecture.md`: the intended boundaries and data flow
 - `samples/`: the fictional evaluation corpus and manifest
+- `playground/agent.md`: standard path setup guide for playground script experiments
 - `backend/app/main.py`: the initial API boundary
 - `frontend/src/App.tsx`: the initial interface boundary
 

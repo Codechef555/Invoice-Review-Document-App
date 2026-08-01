@@ -16,10 +16,12 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_PATH = PROJECT_ROOT / "backend"
-# Ensure the backend package is importable from playground.
-sys.path.insert(0, str(BACKEND_PATH))
 
-from app.services.document_intelligence_services import DocumentIntelligenceService
+# Ensure backend package is importable from playground
+if str(BACKEND_PATH) not in sys.path:
+    sys.path.insert(0, str(BACKEND_PATH))
+
+from app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
 
 SAMPLE_INVOICE = PROJECT_ROOT / "samples" / "generated" / "01-en-happy-classic.pdf"
 

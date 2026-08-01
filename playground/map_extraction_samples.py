@@ -18,17 +18,12 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_PATH = PROJECT_ROOT / "backend"
 
-# Ensure both backend/ and project root are in sys.path
-for p in (str(BACKEND_PATH), str(PROJECT_ROOT)):
-    if p not in sys.path:
-        sys.path.insert(0, p)
+# Ensure backend package is importable from playground
+if str(BACKEND_PATH) not in sys.path:
+    sys.path.insert(0, str(BACKEND_PATH))
 
-try:
-    from app.schemas.invoice.mapping import map_invoice_fields  # noqa: E402
-    from app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
-except ImportError:
-    from backend.app.schemas.invoice.mapping import map_invoice_fields  # noqa: E402
-    from backend.app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
+from app.schemas.invoice.mapping import map_invoice_fields  # noqa: E402
+from app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
 
 
 DEFAULT_SAMPLE = PROJECT_ROOT / "samples" / "generated" / "01-en-happy-classic.pdf"

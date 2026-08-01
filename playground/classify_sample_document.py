@@ -14,8 +14,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_PATH = PROJECT_ROOT / "backend"
 
-# Ensure backend package is importable
-sys.path.insert(0, str(BACKEND_PATH))
+# Ensure backend package is importable from playground
+if str(BACKEND_PATH) not in sys.path:
+    sys.path.insert(0, str(BACKEND_PATH))
 
 from app.pipeline.classifier import classify_document_text  # noqa: E402
 from app.services.document_intelligence_services import DocumentIntelligenceService  # noqa: E402
