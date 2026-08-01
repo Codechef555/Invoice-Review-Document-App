@@ -31,15 +31,15 @@ class DocumentIntelligenceService:
         self.client = get_document_intelligence_client(endpoint, api_key)
         self.model_id = model_id
 
-    def analyze_invoice(
-        self, invoice_path: Path | str, model_id: str | None = None
+    def analyze_document(
+        self, document_path: Path | str, model_id: str | None = None
     ) -> Any:
-        document_path = Path(invoice_path)
-        if not document_path.exists():
-            raise FileNotFoundError(f"Document file not found: {document_path}")
+        doc_path = Path(document_path)
+        if not doc_path.exists():
+            raise FileNotFoundError(f"Document file not found: {doc_path}")
 
         target_model = model_id or self.model_id
-        with document_path.open("rb") as stream:
+        with doc_path.open("rb") as stream:
             poller = self.client.begin_analyze_document(
                 model_id=target_model,
                 body=stream,
@@ -47,7 +47,10 @@ class DocumentIntelligenceService:
             )
             return poller.result()
 
-    analyze_document = analyze_invoice
+    def analyze_invoice(
+        self, invoice_path: Path | str, model_id: str | None = None
+    ) -> Any:
+        return self.analyze_document(document_path=invoice_path, model_id=model_id)
 
     @staticmethod
     def to_dict(analysis: Any) -> dict[str, Any]:
