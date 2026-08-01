@@ -17,6 +17,10 @@ class DocumentClassification(BaseModel):
         le=1.0,
         description="Confidence score of the classification from 0.0 to 1.0.",
     )
+    detected_keywords: list[str] = Field(
+        default_factory=list,
+        description="Key terms detected in document (e.g. 'Tax Invoice', 'VAT ID', 'Receipt').",
+    )
     reasoning: str = Field(
         description="Short rationale explaining the classification decision.",
     )
@@ -32,16 +36,22 @@ def classify_document_text(
 
     system_prompt = (
         "You are an automated document classification engine for an accounting app. "
-        "Analyze the provided document text and classify whether it is an 'invoice', "
-        "a 'receipt', or 'unsupported'."
+        "Analyze the provided document text, extract key identifying terms, and classify "
+        "whether it is an 'invoice', a 'receipt', or 'unsupported'."
     )
+
+    # Explicit Keyword Arguments passed to Azure OpenAI parse API:
+    # 1. model: Azure deployment name
+    # 2. messages: System and User conversation roles & input text
+    # 3. response_format: Pydantic schema class enforcing structured JSON response
+    messages_payload = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": document_text},
+    ]
 
     completion = client.beta.chat.completions.parse(
         model=model_deployment,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": document_text},
-        ],
+        messages=messages_payload,
         response_format=DocumentClassification,
     )
 
