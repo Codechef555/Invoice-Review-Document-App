@@ -1,5 +1,8 @@
 # Invoice Review
 
+<img width="905" height="717" alt="image" src="https://github.com/user-attachments/assets/1c47af14-86a7-415f-97e7-dc1b11a12089" />
+
+
 This is the clean starter for an end-to-end invoice and receipt review application. You will build a workflow for Northstar Facilities B.V. that combines Azure document extraction, deterministic finance rules, SQLite persistence, and a human review interface.
 
 
