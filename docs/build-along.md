@@ -30,6 +30,7 @@ cp frontend/.env.example frontend/.env
 
 - `docs/client-brief.md`: the recurring finance problem and definition of done
 - `docs/architecture.md`: the intended boundaries and data flow
+- `docs/api-and-pipeline.md`: complete REST API endpoint specification and 5-step pipeline architecture documentation
 - `samples/`: the fictional evaluation corpus and manifest
 - `playground/agent.md`: standard path setup guide for playground script experiments
 - `backend/app/pipeline/chain.py`: pipeline chaining core (`PipelineContext`, `PipelineStep`, `Pipeline`)
