@@ -59,8 +59,7 @@ cp frontend/.env.example frontend/.env
 - [x] Backend lint passes (`ruff check backend playground`).
 - [x] Document processing pipeline chain verified.
 - [x] FastAPI REST API endpoints & SQLite repository initialized.
-- [ ] Frontend type-check, lint, and production build pass.
-- [ ] `./scripts/dev.sh --check` reports that Invoice Review is ready to start.
-- [ ] The health endpoint and starter screen load locally.
+- [x] Frontend type-check, lint, and production build pass.
+- [x] The health endpoint and starter screen load locally.
 
 Continue with the [online tutorial](https://learn.datalumina.com/docs/invoice-review).
