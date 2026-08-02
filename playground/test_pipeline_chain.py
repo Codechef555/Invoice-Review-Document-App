@@ -28,9 +28,6 @@ from backend.app.pipeline.chain import Pipeline, PipelineContext  # noqa: E402
 from backend.app.pipeline.classification import DocumentClassification  # noqa: E402
 from backend.app.pipeline.gl_categorization import GLCategorization  # noqa: E402
 from backend.app.pipeline.steps import (  # noqa: E402
-    ClassificationStep,
-    ExtractionStep,
-    GLCategorizationStep,
     MappingStep,
     ValidationStep,
 )

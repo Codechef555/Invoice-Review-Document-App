@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -85,13 +84,16 @@ class GLCategorization(BaseModel):
 
 def _format_extracted_summary(data: InvoiceExtraction | ReceiptExtraction) -> str:
     vendor = getattr(data, "vendor_name", None)
-    vendor_str = str(vendor.value or vendor.content) if vendor and (vendor.value or vendor.content) else "Unknown"
+    v_val = (vendor.value or vendor.content) if vendor else None
+    vendor_str = str(v_val) if v_val else "Unknown"
 
     total_obj = getattr(data, "invoice_total", None)
-    total_str = str(total_obj.value or total_obj.content) if total_obj and (total_obj.value or total_obj.content) else "Unknown"
+    t_val = (total_obj.value or total_obj.content) if total_obj else None
+    total_str = str(t_val) if t_val else "Unknown"
 
     curr_obj = getattr(data, "currency", None)
-    currency_str = str(curr_obj.value or curr_obj.content) if curr_obj and (curr_obj.value or curr_obj.content) else "EUR"
+    c_val = (curr_obj.value or curr_obj.content) if curr_obj else None
+    currency_str = str(c_val) if c_val else "EUR"
 
     line_descriptions = []
     for item in getattr(data, "line_items", []):
@@ -122,7 +124,8 @@ def suggest_gl_account(
 
     system_prompt = (
         "You are an automated accounting assistant for Northstar Facilities B.V.\n"
-        "Categorize the provided document into EXACTLY ONE General Ledger (GL) account from this catalog:\n\n"
+        "Categorize the provided document into EXACTLY ONE General Ledger (GL) account "
+        "from this catalog:\n\n"
         f"{catalog_formatted}\n\n"
         "Return the account_code (4 digits), account_name, confidence (0.0 to 1.0), and reasoning."
     )

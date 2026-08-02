@@ -1,0 +1,66 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from app.accounting.routes import router as accounting_router
+from app.config import APP_CONFIG, get_settings
+from app.database import build_database
+from app.documents.models import DocumentRecord
+from app.documents.routes import router as document_router
+
+
+def create_app() -> FastAPI:
+    config = APP_CONFIG
+    config.upload_dir.mkdir(parents=True, exist_ok=True)
+
+    if config.database_url.startswith("sqlite:///"):
+        database_path = config.database_url.removeprefix("sqlite:///")
+        Path(database_path).parent.mkdir(parents=True, exist_ok=True)
+
+    engine, session_factory = build_database(config.database_url)
+    DocumentRecord.metadata.create_all(engine)
+
+    settings = get_settings()
+
+    app = FastAPI(title="Invoice Review API", version="0.1.0")
+    app.state.config = config
+    app.state.engine = engine
+    app.state.session_factory = session_factory
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[settings.allowed_origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.include_router(document_router)
+    app.include_router(accounting_router)
+
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    frontend_dist = settings.resolve_frontend_dist()
+    if frontend_dist is not None:
+        assets_dir = frontend_dist / "assets"
+        if assets_dir.is_dir():
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+        @app.get("/{full_path:path}")
+        def spa_fallback(full_path: str) -> FileResponse:
+            candidate = frontend_dist / full_path
+            if full_path and candidate.is_file():
+                return FileResponse(candidate)
+            return FileResponse(frontend_dist / "index.html")
+
+    return app
+
+
+app = create_app()
