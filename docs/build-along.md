@@ -53,12 +53,14 @@ cp frontend/.env.example frontend/.env
 - `GET http://localhost:8000/api/accounting/catalog` returns 10 GL catalog accounts.
 - `http://localhost:5173` shows the Invoice Review starter screen.
 - Running `uv run --project backend --locked --no-sync python playground/test_pipeline_chain.py` successfully executes the document pipeline chain.
+- Running `uv run --project backend --locked --no-sync python playground/evaluate_samples.py` evaluates all 13 sample corpus scenarios with 100% pass rate.
 
 ## Checkpoint
 
 - [x] Locked backend and frontend installs succeed.
 - [x] Backend lint passes (`ruff check backend playground`).
 - [x] Document processing pipeline chain verified.
+- [x] Sample evaluation corpus harness passes 13/13 scenarios with 100% pass rate.
 - [x] FastAPI REST API endpoints & SQLite repository initialized.
 - [x] Frontend type-check, lint, and production build pass.
 - [x] The health endpoint and starter screen load locally.

@@ -86,7 +86,7 @@ def validate_review_data(
         if abs(expected_total - data.invoice_total) > 0.01:
             issues.append(
                 ValidationIssue(
-                    code="TOTAL_MISMATCH",
+                    code="invoice_total_mismatch",
                     field="invoice_total",
                     severity="error",
                     message=(
@@ -103,7 +103,7 @@ def validate_review_data(
         if not vat.is_valid(clean_vat):
             issues.append(
                 ValidationIssue(
-                    code="INVALID_VENDOR_VAT_ID",
+                    code="vendor_vat_id_invalid",
                     field="vendor_vat_id",
                     severity="error",
                     message=f"Supplier VAT ID '{clean_vat}' failed EU format/checksum validation.",
@@ -112,7 +112,7 @@ def validate_review_data(
     elif not is_receipt:
         issues.append(
             ValidationIssue(
-                code="MISSING_VENDOR_VAT_ID",
+                code="vendor_vat_id_required",
                 field="vendor_vat_id",
                 severity="error",
                 message="Supplier VAT ID is missing.",
@@ -174,7 +174,7 @@ def validate_review_data(
             if clean_c_vat != clean_exp_vat:
                 issues.append(
                     ValidationIssue(
-                        code="MISMATCHED_CUSTOMER_VAT_ID",
+                        code="customer_vat_id_mismatch",
                         field="customer_vat_id",
                         severity="error",
                         message=(
@@ -202,7 +202,7 @@ def validate_review_data(
         if not data.purchase_order or not data.purchase_order.strip():
             issues.append(
                 ValidationIssue(
-                    code="MISSING_PO_NUMBER",
+                    code="purchase_order_missing",
                     field="purchase_order",
                     severity="warning",
                     message="Purchase order number is missing.",
@@ -213,7 +213,7 @@ def validate_review_data(
         if is_duplicate:
             issues.append(
                 ValidationIssue(
-                    code="DUPLICATE_INVOICE_KEY",
+                    code="duplicate_invoice",
                     field="invoice_number",
                     severity="error",
                     message=(

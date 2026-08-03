@@ -65,10 +65,10 @@ def to_response(record: DocumentRecord) -> DocumentResponse:
     has_supplier_issue = any(
         issue.code in {
             "MISSING_VENDOR_NAME",
-            "MISSING_VENDOR_VAT_ID",
-            "INVALID_VENDOR_VAT_ID",
+            "vendor_vat_id_required",
+            "vendor_vat_id_invalid",
             "MISSING_INVOICE_NUMBER",
-            "TOTAL_MISMATCH",
+            "invoice_total_mismatch",
         }
         for issue in issues
     )
