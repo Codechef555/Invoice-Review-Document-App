@@ -1,57 +1,259 @@
 # Invoice Review
 
-This is the clean starter for an end-to-end invoice and receipt review application. You will build a workflow for Northstar Facilities B.V. that combines Azure document extraction, deterministic finance rules, SQLite persistence, and a human review interface.
+<p align="center">
+  <img width="900" alt="Invoice Review Application" src="https://github.com/user-attachments/assets/1c47af14-86a7-415f-97e7-dc1b11a12089">
+</p>
 
+An end-to-end AI-powered invoice and receipt processing application built with **Azure AI Document Intelligence**, **Azure OpenAI**, **FastAPI**, **Pydantic**, **SQLite**, and **React**.
 
-## What is included
+Throughout this project you'll build an intelligent document review workflow for **Northstar Facilities B.V.** that automatically classifies financial documents, extracts structured data, validates business rules, stores review results, and exposes everything through a clean web interface.
 
-- The client brief and target architecture
-- A fictional 13-document multilingual corpus
-- Safe environment templates
-- Exact dependency pins and lockfiles
-- Backend and frontend project configuration
+> **This repository is a tutorial starter.** The application code is intentionally omitted so you can build the complete system step-by-step.
 
-Application code is intentionally absent. The tutorial builds the backend and frontend from this starting point.
+---
 
-## Prerequisites
+# What You'll Build
 
-- Python 3.12 or newer
+By the end of the tutorial you'll have an application capable of:
+
+- 📄 Classifying invoices vs receipts
+- 🤖 Extracting structured data using Azure Document Intelligence
+- 🧠 Using Azure OpenAI structured outputs where appropriate
+- 🏗️ Mapping extracted data into Pydantic models
+- ✅ Validating finance rules and VAT numbers
+- 💾 Persisting review results in SQLite
+- 🔍 Providing a human review interface
+- ⚡ Exposing the workflow through a FastAPI backend
+- 🎨 Building a React frontend for document review
+
+---
+
+# Architecture
+
+```
+                Uploaded Document
+                        │
+                        ▼
+           Document Classification
+                        │
+         ┌──────────────┴──────────────┐
+         ▼                             ▼
+Invoice Model                 Receipt Model
+         │                             │
+         └──────────────┬──────────────┘
+                        ▼
+          Pydantic Data Models
+                        │
+                        ▼
+          Business Rule Validation
+                        │
+                        ▼
+              SQLite Persistence
+                        │
+                        ▼
+            Human Review Interface
+```
+
+---
+
+# What's Included
+
+This starter repository contains everything required to follow the tutorial:
+
+- Client brief
+- Target architecture
+- Fictional multilingual document corpus (13 documents)
+- Environment templates
+- Dependency lockfiles
+- Backend project configuration
+- Frontend project configuration
+
+The implementation itself is intentionally absent so you can build each stage yourself.
+
+---
+
+# Tech Stack
+
+## Backend
+
+- Python 3.12+
+- FastAPI
+- Pydantic
+- Azure AI Document Intelligence
+- Azure OpenAI
+- SQLite
 - uv
-- Node.js 22 or newer
-- pnpm 11
 
-## Install
+## Frontend
+
+- React
+- Vite
+- TypeScript
+- pnpm
+
+---
+
+# Prerequisites
+
+Install the following before starting:
+
+- Python 3.12+
+- uv
+- Node.js 22+
+- pnpm 11+
+
+---
+
+# Installation
+
+Clone the repository and install dependencies.
+
+## Backend
 
 ```bash
 cd backend
 uv sync --locked
+```
 
-cd ../frontend
+## Frontend
+
+```bash
+cd frontend
 pnpm install --frozen-lockfile
 ```
 
-Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` when the tutorial reaches environment configuration. The backend file contains only Azure provider configuration; the frontend file contains `VITE_API_BASE_URL`. Add real Azure values only when the provider stages require them.
+---
 
-## Verify the starter installation
+# Environment Variables
+
+Copy the example environment files.
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+During the tutorial you'll configure:
+
+### Backend
+
+Azure credentials for:
+
+- Azure AI Document Intelligence
+- Azure OpenAI
+
+### Frontend
+
+```text
+VITE_API_BASE_URL
+```
+
+No Azure credentials are required until the provider sections of the tutorial.
+
+---
+
+# Verify Installation
+
+Backend:
 
 ```bash
 cd backend
 uv sync --locked
+```
 
-cd ../frontend
+Frontend:
+
+```bash
+cd frontend
 pnpm install --frozen-lockfile
 ```
 
-## Choose a branch
+If both complete successfully, you're ready to begin.
 
-- `main`: clone this branch to follow the tutorial from the prepared starting point.
-- `development`: inspect the public working branch and later experiments.
-- `solution`: inspect the reviewed end product.
+---
 
-To switch to the finished application:
+# Repository Branches
+
+The repository contains multiple branches depending on how you'd like to follow along.
+
+| Branch | Purpose |
+|---------|----------|
+| **main** | Clean tutorial starter |
+| **development** | Public work-in-progress implementation |
+| **solution** | Completed application |
+
+Switch to the finished implementation anytime:
 
 ```bash
 git switch solution
 ```
 
-Start with [the client brief](docs/client-brief.md), then follow the [complete tutorial](https://learn.datalumina.com/docs/invoice-review).
+---
+
+# Tutorial Roadmap
+
+You'll progressively build:
+
+- Azure Document Intelligence service
+- Pydantic data models
+- Mapping layer
+- Azure OpenAI integration
+- Classification pipeline
+- Chained processing workflow
+- Business rule engine
+- FastAPI API
+- React frontend
+- Human review workflow
+
+---
+
+# Project Structure
+
+```
+backend/
+    app/
+    samples/
+    playground/
+    tests/
+
+frontend/
+    src/
+
+docs/
+    client-brief.md
+```
+
+---
+
+# Getting Started
+
+1. Read the client brief.
+
+```
+docs/client-brief.md
+```
+
+2. Follow the complete tutorial.
+
+https://learn.datalumina.com/docs/invoice-review
+
+---
+
+# Learning Outcomes
+
+By completing this project you'll gain practical experience with:
+
+- Azure AI Document Intelligence
+- Azure OpenAI
+- Structured Outputs
+- Pydantic
+- FastAPI
+- AI pipeline orchestration
+- Document processing workflows
+- Financial document validation
+- React + TypeScript
+- Full-stack AI applications
+
+---
+
+Happy building! 🚀
