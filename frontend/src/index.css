@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-zinc-50 text-zinc-950 antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
+body {
+  background-color: var(--color-zinc-50);
+  color: var(--color-zinc-950);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
+
