@@ -1,0 +1,25 @@
+.git
+.gitignore
+.dockerignore
+.ruff_cache
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Build artifacts
+frontend/dist
+frontend/node_modules
+backend/.venv
+data/
+
+# Environment files and documentation
+.env
+.env.*
+docs/
+playground/
+samples/
+README.md
+LICENSE
+AGENTS.md

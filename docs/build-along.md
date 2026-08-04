@@ -46,6 +46,9 @@ cp frontend/.env.example frontend/.env
 - `backend/app/accounting/routes.py`: REST API endpoint for GL catalog (`/api/accounting/catalog`)
 - `backend/app/main.py`: FastAPI app factory (`create_app()`), CORS, router mounts, and SPA static file fallback
 - `frontend/src/App.tsx`: the initial interface boundary
+- `Dockerfile`: multi-stage Docker build for React SPA static serving + FastAPI backend
+- `.dockerignore`: context exclusions for Docker build
+- `scripts/deploy-azure.ps1`: PowerShell deployment script for Azure CLI single-container deployment
 
 ## What you should observe
 
@@ -54,6 +57,7 @@ cp frontend/.env.example frontend/.env
 - `http://localhost:5173` shows the Invoice Review starter screen.
 - Running `uv run --project backend --locked --no-sync python playground/test_pipeline_chain.py` successfully executes the document pipeline chain.
 - Running `uv run --project backend --locked --no-sync python playground/evaluate_samples.py` evaluates all 13 sample corpus scenarios with 100% pass rate.
+- Multi-stage single-container Docker build packages Vite static files and FastAPI backend into a single image.
 
 ## Checkpoint
 
@@ -64,5 +68,6 @@ cp frontend/.env.example frontend/.env
 - [x] FastAPI REST API endpoints & SQLite repository initialized.
 - [x] Frontend type-check, lint, and production build pass.
 - [x] The health endpoint and starter screen load locally.
+- [x] Single-container Azure deployment configuration created (`Dockerfile`, `.dockerignore`, `scripts/deploy-azure.ps1`).
 
 Continue with the [online tutorial](https://learn.datalumina.com/docs/invoice-review).
