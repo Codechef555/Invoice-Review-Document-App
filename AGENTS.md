@@ -21,7 +21,6 @@ Read `docs/client-brief.md`, `docs/architecture.md`, and `docs/build-along.md` b
 - Business rules live in `backend/app/invoices/validation.py` and must be pure.
 - HTTP concerns live in `routes.py`; orchestration lives in `service.py`; SQLite access lives in `repository.py`.
 - Once those modules are introduced, settings are read only through `backend/app/config.py` and `frontend/src/lib/env.ts`.
-- Do not add auth, queues, workers, deployment, batch processing, email ingestion/sending, or accounting integrations.
 - Receipt processing uses the same normalized financial-document data and a separate deterministic policy. Live VIES registration lookup remains outside the build.
 
 ## Dependencies

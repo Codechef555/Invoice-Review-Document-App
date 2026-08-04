@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     azure_openai_api_key: str | None = Field(default=None)
     allowed_origin: str = "http://localhost:5173"
     frontend_dist_dir: Path | None = None
+    app_password: str = "northstar123"
 
     def resolve_frontend_dist(self) -> Path | None:
         if self.frontend_dist_dir is not None:

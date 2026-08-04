@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.accounting.routes import router as accounting_router
+from app.auth.routes import router as auth_router
 from app.config import APP_CONFIG, get_settings
 from app.database import build_database
 from app.documents.models import DocumentRecord
@@ -40,6 +41,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(auth_router)
     app.include_router(document_router)
     app.include_router(accounting_router)
 

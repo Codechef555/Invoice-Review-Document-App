@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { DocumentInbox } from './components/DocumentInbox'
 import { DocumentReview } from './components/DocumentReview'
+import { PasswordGate } from './components/PasswordGate'
 import { ProcessingStep } from './components/ProcessingStep'
 import { UploadStep } from './components/UploadStep'
 import { WelcomePortal } from './components/WelcomePortal'
@@ -15,9 +16,10 @@ interface AppHeaderProps {
   onHome: () => void
   onNew: () => void
   onHistory: () => void
+  onLogout: () => void
 }
 
-function AppHeader({ onHome, onNew, onHistory }: AppHeaderProps) {
+function AppHeader({ onHome, onNew, onHistory, onLogout }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -41,6 +43,9 @@ function AppHeader({ onHome, onNew, onHistory }: AppHeaderProps) {
           <Button onClick={onNew} size="sm">
             New review
           </Button>
+          <Button onClick={onLogout} variant="ghost" size="sm">
+            Lock
+          </Button>
         </nav>
       </div>
     </header>
@@ -48,6 +53,9 @@ function AppHeader({ onHome, onNew, onHistory }: AppHeaderProps) {
 }
 
 function App() {
+  const [authenticated, setAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('app_authenticated') === 'true'
+  })
   const [view, setView] = useState<View>('welcome')
   const [file, setFile] = useState<File | null>(null)
   const [selected, setSelected] = useState<Document | null>(null)
@@ -56,6 +64,16 @@ function App() {
   const [accountsLoading, setAccountsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [historyLoading, setHistoryLoading] = useState(false)
+
+  const handleAuthSuccess = () => {
+    sessionStorage.setItem('app_authenticated', 'true')
+    setAuthenticated(true)
+  }
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('app_authenticated')
+    setAuthenticated(false)
+  }
 
   const refreshAccounts = useCallback(async () => {
     setAccountsLoading(true)
@@ -69,40 +87,38 @@ function App() {
   }, [])
 
   useEffect(() => {
-    let active = true
-    void listGlAccounts()
-      .then((loaded) => {
-        if (active) setAccounts(loaded)
-      })
-      .catch(() => {
-        if (active) setAccounts([])
-      })
-      .finally(() => {
-        if (active) setAccountsLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [])
+    void refreshAccounts()
+  }, [refreshAccounts])
+
+  if (!authenticated) {
+    return <PasswordGate onSuccess={handleAuthSuccess} />
+  }
 
   function startReview() {
+    setError(null)
     setFile(null)
     setSelected(null)
-    setError(null)
     setView('upload')
   }
 
   async function openHistory() {
-    setView('history')
     setError(null)
     setHistoryLoading(true)
+    setView('history')
     try {
       setDocuments(await listDocuments())
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Could not load review history.')
+      const message = reason instanceof Error ? reason.message : 'Could not load review history.'
+      setError(message)
     } finally {
       setHistoryLoading(false)
     }
+  }
+
+  async function showDocument(doc: Document) {
+    setError(null)
+    setSelected(doc)
+    setView('result')
   }
 
   async function processDocument() {
@@ -110,36 +126,28 @@ function App() {
     setError(null)
     setView('processing')
     try {
-      const processed = await uploadDocument(file)
-      setSelected(processed)
-      setDocuments((current) => [processed, ...current.filter((item) => item.id !== processed.id)])
-      if (!accountsLoading && accounts.length === 0) void refreshAccounts()
+      const doc = await uploadDocument(file)
+      setSelected(doc)
       setView('result')
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Could not process the document.')
+      const message = reason instanceof Error ? reason.message : 'Processing failed.'
+      setError(message)
       setView('upload')
     }
   }
 
-  function handleChanged(changed: Document) {
-    setSelected(changed)
-    setDocuments((current) =>
-      current.map((item) => (item.id === changed.id ? changed : item)),
-    )
+  function handleChanged(updated: Document) {
+    setSelected(updated)
+    setDocuments((current) => current.map((doc) => (doc.id === updated.id ? updated : doc)))
   }
 
-  function showDocument(next: Document) {
-    setSelected(next)
-    setView('result')
-  }
-
-  async function removeHistoryDocument(next: Document) {
-    setError(null)
+  async function removeHistoryDocument(doc: Document) {
     try {
-      await deleteDocument(next.id)
-      setDocuments((current) => current.filter((item) => item.id !== next.id))
-      if (selected?.id === next.id) {
+      await deleteDocument(doc.id)
+      setDocuments((current) => current.filter((item) => item.id !== doc.id))
+      if (selected?.id === doc.id) {
         setSelected(null)
+        setView('history')
       }
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : 'Could not delete the document.'
@@ -159,6 +167,7 @@ function App() {
           onHome={home}
           onNew={startReview}
           onHistory={() => void openHistory()}
+          onLogout={handleLogout}
         />
       )}
 

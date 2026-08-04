@@ -23,6 +23,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>
 }
 
+export function verifyPassword(password: string): Promise<{ success: boolean; message: string }> {
+  return request<{ success: boolean; message: string }>('/api/auth/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  })
+}
+
 export function listDocuments(): Promise<Document[]> {
   return request<Document[]>('/api/documents')
 }

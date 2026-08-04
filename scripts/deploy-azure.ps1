@@ -3,7 +3,8 @@ param(
     [string]$ResourceGroup = "rg-invoice-review",
     [string]$Location = "westeurope",
     [string]$AppName = "app-invoice-review",
-    [string]$AcrName = "acrinvoicereview$((Get-Random -Minimum 1000 -Maximum 9999))"
+    [string]$AcrName = "acrinvoicereview$((Get-Random -Minimum 1000 -Maximum 9999))",
+    [string]$AppPassword = "northstar123"
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,7 +38,8 @@ az containerapp create `
   --environment "env-invoice-review" `
   --image "$AcrName.azurecr.io/invoice-review-app:v1" `
   --target-port 8000 `
-  --ingress external
+  --ingress external `
+  --env-vars "APP_PASSWORD=$AppPassword"
 
 Write-Host "==> Deployment complete!" -ForegroundColor Green
 $AppUrl = az containerapp show --name $AppName --resource-group $ResourceGroup --query "properties.configuration.ingress.fqdn" -o tsv
